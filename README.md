@@ -1,3 +1,3 @@
 # Utegraphium
 
-## the source code for my website >:)
+## the source code of my website >:)
