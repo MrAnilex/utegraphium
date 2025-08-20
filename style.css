@@ -18,7 +18,7 @@ body{display:flex;align-items:center;justify-content:center;padding:40px}
 
 .wrap{width:100%;max-width:var(--max-width);display:grid;grid-template-columns:1fr 320px;grid-gap:20px;align-items:start}
 
-title{margin:8px 0;font-weight:700;letter-spacing:0.02em}
+.title{margin:8px 0;font-weight:700;letter-spacing:0.02em}
 .tagline{margin:0;color:var(--muted);font-size:14px}
 
 .glass{
@@ -57,6 +57,8 @@ header.glass{display:flex;flex-direction:column;gap:8px}
 
 .collection .artifact{display:inline-block;margin:6px;padding:8px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.03);color:var(--muted)}
 .unlock{margin-top:12px;color:#b3ffde;font-weight:700}
+
+.comment{padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:8px}
 
 @media (max-width:900px){
   .wrap{grid-template-columns:1fr; padding-bottom:40px}

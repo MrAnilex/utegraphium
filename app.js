@@ -92,12 +92,20 @@ const artifactsBtn = document.getElementById("artifactsBtn");
 const closeArtifacts = document.getElementById("closeArtifacts");
 const closeComments = document.getElementById("closeComments");
 const closeMailbox = document.getElementById("closeMailbox");
+const settingsBtn = document.getElementById("settingsBtn");
+
+// keyboard escape to close modals
+window.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    [reader, commentsModal, mailbox, artifactsModal].forEach(m=> m && !m.classList.contains('hidden') && m.classList.add('hidden'));
+  }
+});
 
 function renderPosts(){
   postList.innerHTML = "";
   posts.forEach(p=>{
     const card = el("div",{class:"post",tabindex:0});
-    const title = el("div",{},p.title);
+    const title = el("div",{class:"post-title"},p.title);
     const meta = el("div",{class:"meta"}, el("span",{},p.excerpt), 
       (function(){
         const lock = checkUnlock(p);
@@ -115,6 +123,7 @@ function renderPosts(){
 }
 
 function checkUnlock(post){
+  if(!post || !post.unlock) return { unlocked: true };
   if(post.unlock.type === "none") return { unlocked: true };
   if(post.unlock.type === "date"){
     const now = Date.now();
@@ -134,27 +143,33 @@ let currentPost = null;
 function openPost(p){
   const unlock = checkUnlock(p);
   if(!unlock.unlocked){
-    if(unlock.missing) alert("Contenu verrouillé. Artefacts manquants : " + unlock.missing.join(", "));
+    if(unlock.missing) alert("Contenu verrouillé. Artefacts manquants : " + unlock.missing.join(", ")); 
     if(unlock.reason === "date") alert("Contenu disponible le : " + formatDate(unlock.until));
     return;
   }
   currentPost = p;
   articleInner.innerHTML = `<h2>${p.title}</h2><div class="article-body">${p.body}</div>`;
+  // hook aside words
   articleInner.querySelectorAll(".aside-word").forEach(w=>{
     w.addEventListener("click", (ev)=>{
       showAsidePopup(w.dataset.aside, ev.clientX, ev.clientY);
     });
   });
+  // mark read
   if(!state.read.includes(p.id)){
     state.read.push(p.id);
     saveState(state);
   }
   updateArtifactButton();
   startAmbienceFor(p);
+  // show reader
+  reader.classList.remove("hidden");
+  reader.setAttribute('aria-hidden', 'false');
 }
 function closeReaderFn(){
   stopAmbience();
   reader.classList.add("hidden");
+  reader.setAttribute('aria-hidden', 'true');
   currentPost = null;
 }
 closeReader.addEventListener("click", closeReaderFn);
@@ -162,13 +177,14 @@ closeReader.addEventListener("click", closeReaderFn);
 function updateArtifactButton(){
   const p = currentPost;
   if(!p) return;
-  const has = state.artifacts.includes(p.artifact.id);
+  const has = (state.artifacts||[]).includes(p.artifact.id);
   collectArtifact.textContent = has ? "Artefact acquis" : "Recevoir artefact";
   collectArtifact.disabled = has;
 }
 collectArtifact.addEventListener("click", ()=>{
   if(!currentPost) return;
   const art = currentPost.artifact;
+  if(!art) return;
   if(!state.artifacts.includes(art.id)){
     state.artifacts.push(art.id);
     saveState(state);
@@ -181,19 +197,17 @@ collectArtifact.addEventListener("click", ()=>{
 
 function renderCollection(){
   artifactCount.textContent = (state.artifacts||[]).length;
-  artifactShelf && (artifactShelf.innerHTML = "");
-  const shelf = document.getElementById("artifactShelf");
-  if(!shelf) return;
-  shelf.innerHTML = "";
+  if(!artifactShelf) return;
+  artifactShelf.innerHTML = "";
   (state.artifacts||[]).forEach(id=>{
     const meta = posts.map(p=>p.artifact).find(a=>a && a.id===id);
     const elc = document.createElement("div"); elc.className="artifact"; elc.textContent = meta ? meta.name : id;
-    shelf.appendChild(elc);
+    artifactShelf.appendChild(elc);
   });
 }
 
 function checkUnlocksAfterArtifact(){
-  const newly = posts.filter(p => p.unlock.type === "requires" && checkUnlock(p).unlocked && !state.read.includes(p.id));
+  const newly = posts.filter(p => p.unlock && p.unlock.type === "requires" && checkUnlock(p).unlocked && !state.read.includes(p.id));
   if(newly.length){
     unlockNotice.textContent = "Nouveau contenu déverrouillé : " + newly.map(n=>n.title).join(", ");
     setTimeout(()=> unlockNotice.textContent = "", 6000);
@@ -261,10 +275,12 @@ function showAsidePopup(text,x,y){
 
 // Comments
 openComments.addEventListener("click", ()=>{
+  if(!currentPost) return alert('Ouvre d\u00ababord un article.');
   commentsModal.classList.remove("hidden");
-  loadCommentsFor(currentPost?.id);
+  commentsModal.setAttribute('aria-hidden','false');
+  loadCommentsFor(currentPost.id);
 });
-closeComments.addEventListener("click", ()=> commentsModal.classList.add("hidden"));
+closeComments.addEventListener("click", ()=> { commentsModal.classList.add("hidden"); commentsModal.setAttribute('aria-hidden','true'); });
 commentForm.addEventListener("submit", (ev)=>{
   ev.preventDefault();
   const author = document.getElementById("author").value || "Anonyme";
@@ -282,14 +298,17 @@ function loadCommentsFor(id){
   const arr = (state.comments[id] || []).slice().reverse();
   if(!arr.length) commentList.innerHTML = "<em>Aucun message. Sois le premier.</em>";
   arr.forEach(c=>{
-    const d = el("div",{class:"comment"}, el("strong",{},c.author), el("div":{"style":"font-size:13px;color:var(--muted)"}, new Date(c.date).toLocaleString()), el("p",{},c.body));
+    const d = el("div",{class:"comment"}, el("strong",{},c.author), el("div",{}, new Date(c.date).toLocaleString()), el("p",{},c.body));
+    // style date
+    d.querySelectorAll('div')[0].style.color = 'var(--muted)';
+    d.querySelectorAll('div')[0].style.fontSize = '12px';
     commentList.appendChild(d);
   });
 }
 
 // Mailbox
-mailboxBtn.addEventListener("click", ()=> mailbox.classList.remove("hidden"));
-closeMailbox.addEventListener("click", ()=> mailbox.classList.add("hidden"));
+mailboxBtn.addEventListener("click", ()=> { mailbox.classList.remove("hidden"); mailbox.setAttribute('aria-hidden','false'); });
+closeMailbox.addEventListener("click", ()=> { mailbox.classList.add("hidden"); mailbox.setAttribute('aria-hidden','true'); });
 mailForm.addEventListener("submit", (ev)=>{
   ev.preventDefault();
   const from = document.getElementById("mailFrom").value || "Anonyme";
@@ -312,12 +331,13 @@ function renderSentMails(){
 renderSentMails();
 
 // Artifacts modal
-artifactsBtn.addEventListener("click", ()=> artifactsModal.classList.remove("hidden"));
-closeArtifacts.addEventListener("click", ()=> artifactsModal.classList.add("hidden"));
+artifactsBtn.addEventListener("click", ()=> { artifactsModal.classList.remove("hidden"); artifactsModal.setAttribute('aria-hidden','false'); });
+closeArtifacts.addEventListener("click", ()=> { artifactsModal.classList.add("hidden"); artifactsModal.setAttribute('aria-hidden','true'); });
 
 // Sky blobs animation
 function seedBlobs(){
   const g = document.getElementById("blobGroup");
+  if(!g) return;
   g.innerHTML = "";
   for(let i=0;i<6;i++){
     const c = document.createElementNS("http://www.w3.org/2000/svg","path");
