@@ -1,0 +1,13 @@
+{
+  "name": "utegraphium",
+  "version": "1.0.0",
+  "description": "I'm giving up Copilot.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

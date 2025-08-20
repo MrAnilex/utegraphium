@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Utegraphium</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="glass">
+    <header>
+      <h1>Utegraphium</h1>
+      <div id="artifact-display"></div>
+    </header>
+    <main>
+      <section id="article-list"></section>
+      <section id="article-view" class="hidden">
+        <button id="back">← Retour</button>
+        <h2 id="article-title"></h2>
+        <div id="article-content"></div>
+        <div id="comments"></div>
+        <div id="comment-form">
+          <textarea id="comment-text" placeholder="Écris une micro-histoire..."></textarea>
+          <button id="submit-comment">Envoyer</button>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <button id="mailbox">Boîte aux lettres</button>
+    </footer>
+  </div>
+
+  <div id="mailbox-modal" class="hidden glass">
+    <textarea id="mailbox-text" placeholder="Message créatif..."></textarea>
+    <div>
+      <button id="send-mail">Envoyer</button>
+      <button id="close-mailbox">Fermer</button>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>

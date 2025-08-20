@@ -1,0 +1,87 @@
+:root {
+  --hue: 200;
+  --bg: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+  --fg: #fff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: hsl(var(--hue), 60%, 10%);
+  color: var(--fg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 1s ease;
+}
+
+.glass {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+#app {
+  width: min(90%, 800px);
+}
+
+header, footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#article-list > div {
+  margin: 1rem 0;
+  padding: 1rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+#article-list > div:hover {
+  transform: scale(1.02);
+}
+
+.hidden {
+  display: none;
+}
+
+#comments {
+  margin-top: 1rem;
+}
+
+#comments .comment {
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+#artifact-display span {
+  margin-right: 0.5rem;
+}
+
+#mailbox-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90%, 400px);
+}
+
+.secret {
+  border-bottom: 1px dotted rgba(255,255,255,0.5);
+  cursor: pointer;
+}
+
+.secret-reveal {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.secret-reveal.visible {
+  opacity: 1;
+}
