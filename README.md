@@ -1,3 +1,4 @@
 # UNDER CONSTRUCTION !!
 
-I'm giving up Copilot.
+Sorry, this website is under construction :(
+# COME BACK LATER !! :D
